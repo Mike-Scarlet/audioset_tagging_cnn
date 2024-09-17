@@ -1,0 +1,77 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python Debugger: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "env": {"PYTHONPATH": "${workspaceFolder}"},
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "generate data",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/utils/dataset.py",
+      "console": "integratedTerminal",
+      "args": [
+        "pack_waveforms_to_hdf5",
+        "--csv_path=K:/t2/aud_debug/eval_segments.csv",
+        "--audios_dir=K:/t2/aud_debug/eval_segments",
+        "--waveforms_hdf5_path=K:/t2/aud_debug/balanced_train.h5",
+        "--mini_data"
+      ]
+    },
+    {
+      "name": "test infer tagging",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/pytorch/inference.py",
+      "console": "integratedTerminal",
+      "args": [
+        "audio_tagging",
+        "--model_type=Cnn14",
+        "--checkpoint_path=Cnn14_mAP=0.431.pth",
+        "--audio_path=resources/R9_ZSCveAHg_7s.wav",
+        "--cuda"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "test infer sed",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/pytorch/inference.py",
+      "console": "integratedTerminal",
+      "args": [
+        "sound_event_detection",
+        "--model_type=Cnn14_DecisionLevelMax",
+        "--checkpoint_path=Cnn14_mAP=0.431.pth",
+        "--audio_path=resources/R9_ZSCveAHg_7s.wav",
+        "--cuda"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "test infer tagging 2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/playground/split_model_inference.py",
+      "console": "integratedTerminal",
+      "env": {"PYTHONPATH": "${workspaceFolder}"},
+      "args": [
+        "audio_tagging",
+        "--model_type=Cnn14LogMel",
+        "--checkpoint_path=Cnn14_mAP=0.431.pth",
+        "--audio_path=resources/R9_ZSCveAHg_7s.wav",
+        "--cuda"
+      ],
+      "justMyCode": false
+    }
+  ]
+}

@@ -189,6 +189,24 @@ class Cnn14(nn.Module):
         x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
         x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
 
+        # import numpy as np
+        # import librosa
+        # from matplotlib import pyplot as plt
+        # np_sq = np.squeeze(x.cpu().numpy())
+        # mel_spec = np_sq.T
+        # plt.figure(figsize=(10, 4))
+        # # librosa.display.specshow(librosa.power_to_db(mel_spec,ref=np.max),y_axis='mel', fmax=14000, x_axis='time')
+        # mel_spec[mel_spec > 10] = 10
+        # mel_spec[mel_spec < -60] = -60
+        # librosa.display.specshow(mel_spec, y_axis='mel', fmax=14000, x_axis='time')
+        # cbar = plt.colorbar(format='%+2.0f dB')
+        # cbar.set_ticks(np.arange(np.min(mel_spec), np.max(mel_spec), 10))
+        # plt.title('Mel spectrogram')
+        # plt.tight_layout()
+        # plt.show()
+
+        print("mel out: {}".format(x.shape))
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -202,25 +220,43 @@ class Cnn14(nn.Module):
 
         x = self.conv_block1(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv1 out: {}".format(x.shape))
         x = self.conv_block2(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv2 out: {}".format(x.shape))
         x = self.conv_block3(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv3 out: {}".format(x.shape))
         x = self.conv_block4(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv4 out: {}".format(x.shape))
         x = self.conv_block5(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv5 out: {}".format(x.shape))
         x = self.conv_block6(x, pool_size=(1, 1), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv6 out: {}".format(x.shape))
+
+
         x = torch.mean(x, dim=3)
         
+        print("conv mean out: {}".format(x.shape))
+
         (x1, _) = torch.max(x, dim=2)
         x2 = torch.mean(x, dim=2)
         x = x1 + x2
+
+        print("add mean max out: {}".format(x.shape))
+
         x = F.dropout(x, p=0.5, training=self.training)
         x = F.relu_(self.fc1(x))
+
+        print("fc1 out: {}".format(x.shape))
+
         embedding = F.dropout(x, p=0.5, training=self.training)
         clipwise_output = torch.sigmoid(self.fc_audioset(x))
+
+        print("clip out: {}".format(clipwise_output.shape))
         
         output_dict = {'clipwise_output': clipwise_output, 'embedding': embedding}
 
@@ -3064,6 +3100,8 @@ class Cnn14_DecisionLevelMax(nn.Module):
         x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
 
         frames_num = x.shape[2]
+
+        print("mel out: {}".format(x.shape))
         
         x = x.transpose(1, 3)
         x = self.bn0(x)
@@ -3078,31 +3116,52 @@ class Cnn14_DecisionLevelMax(nn.Module):
 
         x = self.conv_block1(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv1 out: {}".format(x.shape))
         x = self.conv_block2(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv2 out: {}".format(x.shape))
         x = self.conv_block3(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv3 out: {}".format(x.shape))
         x = self.conv_block4(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv4 out: {}".format(x.shape))
         x = self.conv_block5(x, pool_size=(2, 2), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv5 out: {}".format(x.shape))
         x = self.conv_block6(x, pool_size=(1, 1), pool_type='avg')
         x = F.dropout(x, p=0.2, training=self.training)
+        print("conv6 out: {}".format(x.shape))
+
         x = torch.mean(x, dim=3)
+        print("conv mean out: {}".format(x.shape))
         
         x1 = F.max_pool1d(x, kernel_size=3, stride=1, padding=1)
         x2 = F.avg_pool1d(x, kernel_size=3, stride=1, padding=1)
         x = x1 + x2
+
+        print("add mean max out: {}".format(x.shape))
+
         x = F.dropout(x, p=0.5, training=self.training)
         x = x.transpose(1, 2)
         x = F.relu_(self.fc1(x))
+
+        print("fc1 out: {}".format(x.shape))
+
         x = F.dropout(x, p=0.5, training=self.training)
         segmentwise_output = torch.sigmoid(self.fc_audioset(x))
+
+        print("segment out: {}".format(segmentwise_output.shape))
+
         (clipwise_output, _) = torch.max(segmentwise_output, dim=1)
+
+        print("clip out: {}".format(clipwise_output.shape))
 
         # Get framewise output
         framewise_output = interpolate(segmentwise_output, self.interpolate_ratio)
         framewise_output = pad_framewise_output(framewise_output, frames_num)
+
+        print("frame out: {}".format(framewise_output.shape))
 
         output_dict = {'framewise_output': framewise_output, 
             'clipwise_output': clipwise_output}
