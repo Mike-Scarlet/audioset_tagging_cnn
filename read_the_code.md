@@ -60,7 +60,8 @@ conv mean out: torch.Size([1, 2048, 21])   < Batch, feat, 时间相关
 add mean max out: torch.Size([1, 2048, 21])
 fc1 out: torch.Size([1, 21, 2048])   < Batch, 时间相关, embedding
 segment out: torch.Size([1, 21, 527])   < Batch, 时间相关, types - 一个segment差不多1s
-clip out: torch.Size([1, 527])
+clip out: torch.Size([1, 527])1
+
 frame out: torch.Size([1, 701, 527])  < segment到frame 的时候，直接duplicate结果
 ```
 
