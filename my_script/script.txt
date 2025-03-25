@@ -1,0 +1,40 @@
+CHECKPOINT_PATH="Cnn14_mAP=0.431.pth"
+wget -O $CHECKPOINT_PATH https://zenodo.org/record/3987831/files/Cnn14_mAP%3D0.431.pth?download=1
+MODEL_TYPE="Cnn14"
+CUDA_VISIBLE_DEVICES=0 python3 pytorch/inference.py audio_tagging \
+    --model_type=$MODEL_TYPE \
+    --checkpoint_path=$CHECKPOINT_PATH \
+    --audio_path="resources/R9_ZSCveAHg_7s.wav" \
+    --cuda
+
+CUDA_VISIBLE_DEVICES=0 python3 pytorch/inference.py audio_tagging \
+    --model_type="Cnn14" \
+    --checkpoint_path="Cnn14_mAP=0.431.pth" \
+    --audio_path="resources/R9_ZSCveAHg_7s.wav" \
+    --cuda
+
+python3 pytorch/inference.py audio_tagging \
+    --model_type="Cnn14" \
+    --checkpoint_path="Cnn14_mAP=0.431.pth" \
+    --audio_path="resources/R9_ZSCveAHg_7s.wav" \
+    --cuda
+
+python3 pytorch/inference.py sound_event_detection \
+    --model_type="Cnn14_DecisionLevelMax" \
+    --checkpoint_path="Cnn14_DecisionLevelMax_mAP=0.385.pth" \
+    --audio_path="resources/R9_ZSCveAHg_7s.wav" \
+    --cuda
+
+python pytorch/inference.py audio_tagging --model_type="Cnn14" --checkpoint_path="Cnn14_mAP=0.431.pth" --audio_path="resources/R9_ZSCveAHg_7s.wav" --cuda
+
+python pytorch/inference.py sound_event_detection --model_type="Cnn14_DecisionLevelMax" --checkpoint_path="Cnn14_DecisionLevelMax_mAP=0.385.pth" --audio_path="resources/R9_ZSCveAHg_7s.wav" --cuda
+
+python pytorch/inference.py sound_event_detection --model_type="Cnn14_DecisionLevelMax" --checkpoint_path="Cnn14_mAP=0.431.pth" --audio_path="resources/R9_ZSCveAHg_7s.wav" --cuda
+
+python pytorch/inference.py sound_event_detection --model_type="Cnn14_DecisionLevelMax" --checkpoint_path="Cnn14_DecisionLevelMax_mAP=0.385.pth" --audio_path="D:\Program Files\DAUM\PotPlayer\Capture\test1.ogg" --cuda
+
+python pytorch/inference.py sound_event_detection --model_type="Cnn14_DecisionLevelMax" --checkpoint_path="Cnn14_DecisionLevelMax_mAP=0.385.pth" --audio_path="J:\A10\manual_scripts\random\RJ1189774\1.SEあり(おすすめ)\test3\age.mp3" --cuda
+
+python pytorch/inference.py audio_tagging --model_type="MobileNetV1" --checkpoint_path="model_file\MobileNetV1_mAP=0.389.pth" --audio_path="resources/R9_ZSCveAHg_7s.wav" --cuda
+
+python pytorch/inference.py sound_event_detection --model_type="MobileNetV1" --checkpoint_path="model_file\MobileNetV1_mAP=0.389.pth" --audio_path="resources/R9_ZSCveAHg_7s.wav" --cuda
